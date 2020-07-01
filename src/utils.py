@@ -20,7 +20,7 @@ def inner_pad(x, factor, padding = 0):
     """
 
     res_shape = x.shape[:-2] + (factor*x.shape[-2], factor*x.shape[-1])
-    res = torch.zeros(res_shape, requires_grad = True) + padding
+    res = torch.zeros(res_shape, requires_grad = True, device=x.device) + padding
     res[..., ::factor, ::factor] = x
 
     return res
@@ -40,6 +40,6 @@ def clip(x):
         same shape as x
     """
 
-    out = torch.max(x, torch.tensor(0.0))
-    out = torch.min(out, torch.tensor(1.0))
+    out = torch.max(x, torch.tensor(0.0, device=x.device))
+    out = torch.min(out, torch.tensor(1.0, device=x.device))
     return out
