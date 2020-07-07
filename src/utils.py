@@ -3,7 +3,6 @@ import torch
 def inner_pad(x, factor, padding = 0):
     """
     Add padding between numbers in x.
-
     Parameters
     ----------
     x : torch.tensor
@@ -12,7 +11,6 @@ def inner_pad(x, factor, padding = 0):
         factor by with to increase last two dimensions
     padding : float, optional
         Number to insert between elements of x (default `0`)
-
     Returns
     -------
     torch.tensor

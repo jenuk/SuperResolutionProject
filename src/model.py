@@ -16,6 +16,6 @@ class Model(nn.Module):
         )
 
     def forward(self, x):
-        out = inner_pad(x - 0.5, 2)
+        out = inner_pad(x, 2)
         out = self.convs(out)
         return out
