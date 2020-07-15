@@ -22,4 +22,4 @@ def psnr(out, targets):
     while len(maxs.shape) > 1:
         maxs = torch.max(maxs, axis=1).values
 
-    return 10*(2*torch.log(maxs) - torch.log(MSEs))
+    return 10*(2*torch.log10(maxs) - torch.log10(MSEs))
