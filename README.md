@@ -13,3 +13,4 @@ My project for the Deep Vision lecture summer semester 2020 by Prof. Ommer.
 | SRCNN | 32 -> 64 | 6 epochs| 68.94 ± 3.88 | 4 layers | [95ad969](https://github.com/jenuk/SuperResolutionProject/tree/95ad969)|
 | SRCNN | 64 -> 128 | | 68.94 ± 4.54 | trained on 32 -> 64 (above) | [95ad969](https://github.com/jenuk/SuperResolutionProject/tree/95ad969) |
 | SRCNN | 64 -> 128 | | 69.04 ± 4.56 | | [95ad969](https://github.com/jenuk/SuperResolutionProject/tree/95ad969) |
+|SRCNN + Discriminator | 32 -> 64 | 6 epochs | 67.27 ± 3.71 | first epoch with MSE | [3fc544c](https://github.com/jenuk/SuperResolutionProject/tree/3fc544c) |
