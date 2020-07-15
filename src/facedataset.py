@@ -2,10 +2,12 @@ import torch
 from torchvision import transforms
 from PIL import Image
 
+from layers import GaussianBlur
+
 class FaceDataset(torch.utils.data.Dataset):
     """ A `Dataset` representing the faces from the ffhq dataset."""
 
-    def __init__(self, path, start, end, lower_res, higher_res, p_flip = 0.5):
+    def __init__(self, path, start, end, lower_res, factor, sigma = 1.0, p_flip = 0.5):
         """
         Parameters
         ----------
@@ -28,22 +30,30 @@ class FaceDataset(torch.utils.data.Dataset):
         self.path = path
         self.start = start
         self.end = end
-        self.flip_transform = transforms.RandomHorizontalFlip(p_flip)
-        self.resize_lower_transform = transforms.Resize(lower_res)
-        self.resize_higher_transform = transforms.Resize(higher_res)
-        self.tensor_transform = transforms.ToTensor()
+        self.factor = factor
+        self.gb = GaussianBlur(int(3*sigma), float(sigma))
+        self.transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(p_flip),
+            transforms.Resize(lower_res*factor),
+            transforms.ToTensor(),
+        ])
 
     def __getitem__(self, idx):
         """returns image at idx in two resoultions"""
+
         idx += self.start
         k = (idx//1000)*1000
         l = idx - k
         img = Image.open(f"{self.path}/{k:05}/{idx:05}.png")
-        img = self.flip_transform(img)
-        lower = self.resize_lower_transform(img)
-        higher = self.resize_higher_transform(img)
-        return self.tensor_transform(lower), self.tensor_transform(higher)
+
+        img = self.transform(img)
+
+        with torch.no_grad():
+            lower = self.gb(img.unsqueeze(0))[0, :, ::self.factor, ::self.factor]
+
+        return lower, img
 
     def __len__(self):
         """returns amount of images in this dataset"""
+
         return self.end - self.start
