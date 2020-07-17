@@ -7,7 +7,7 @@ from layers import GaussianBlur
 class FaceDataset(torch.utils.data.Dataset):
     """ A `Dataset` representing the faces from the ffhq dataset."""
 
-    def __init__(self, path, start, end, lower_res, factor, sigma = 1.0, p_flip = 0.5):
+    def __init__(self, path, start, end, lower_res, factor, sigma = 1.0, p_flip = 0.5, use_gpu = False):
         """
         Parameters
         ----------
@@ -31,7 +31,8 @@ class FaceDataset(torch.utils.data.Dataset):
         self.start = start
         self.end = end
         self.factor = factor
-        self.gb = GaussianBlur(int(3*sigma), float(sigma))
+        self.use_gpu = use_gpu
+        self.gb = GaussianBlur(int(3*sigma), float(sigma), use_gpu)
         self.transform = transforms.Compose([
             transforms.RandomHorizontalFlip(p_flip),
             transforms.Resize(lower_res*factor),
@@ -47,6 +48,8 @@ class FaceDataset(torch.utils.data.Dataset):
         img = Image.open(f"{self.path}/{k:05}/{idx:05}.png")
 
         img = self.transform(img)
+        if self.use_gpu:
+            img = img.cuda()
 
         with torch.no_grad():
             lower = self.gb(img.unsqueeze(0))[0, :, ::self.factor, ::self.factor]
