@@ -3,24 +3,22 @@ from torchvision import transforms
 from torch import nn
 import torch
 
-class Classic(nn.Module):
+class Classic:
     """
-    Basically a PIL resize, wrapped in a torch model.
+    A wrapper for PIL's resize in batches.
     """
 
-    def __init__(self, size, interpolation = Image.BILINEAR):
-        super().__init__()
-
-        self.size = size
+    def __init__(self, output_size, interpolation = Image.BILINEAR):
+        self.output_size = output_size
         self.trafo = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.Resize(size, interpolation),
+            transforms.Resize(output_size, interpolation),
             transforms.ToTensor(),
         ])
 
-    def forward(self, x):
+    def __call__(self, x):
         N = x.shape[0]
-        res = torch.zeros((N, 3, self.size, self.size))
+        res = torch.zeros((N, 3, self.output_size, self.output_size))
 
         # transforms do not support batches
         for i in range(N):

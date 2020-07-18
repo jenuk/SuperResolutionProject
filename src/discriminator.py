@@ -59,8 +59,8 @@ class Discriminator(nn.Module):
         self.fc2 = nn.Linear(100, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
-        # -> 0 for real data
-        # -> 1 for upscaled data
+        # -> 1 for real data
+        # -> 0 for upscaled data
 
     def forward(self, x):
         out = self.from_rgb(x)

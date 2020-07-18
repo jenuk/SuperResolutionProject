@@ -53,10 +53,9 @@ class DiscriminatorLoss(nn.Module):
         super(DiscriminatorLoss, self).__init__()
 
         self.disc = disc
-        self.criterion = nn.BCELoss()
 
     def forward(self, x):
-        return self.criterion(self.disc(x), torch.zeros(x.shape[0], 1, device=x.device))
+        return -torch.mean(torch.log(self.disc(x)))
 
 class TotalVariationLoss(nn.Module):
     def forward(self, x):

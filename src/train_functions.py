@@ -39,10 +39,10 @@ def train_discriminator(model, discriminator, optimizer, loader, use_gpu=False):
         optimizer.zero_grad()
 
         pred_upscaled = discriminator(upscaled)
-        l1 = criterion(pred_upscaled, torch.ones(batch_size//2, 1, device=pred_upscaled.device))
+        l1 = criterion(pred_upscaled, torch.zeros(batch_size//2, 1, device=pred_upscaled.device))
 
         pred_orig = discriminator(orig)
-        l2 = criterion(pred_orig, torch.zeros(batch_size//2, 1, device=pred_orig.device))
+        l2 = criterion(pred_orig, torch.ones(batch_size//2, 1, device=pred_orig.device))
 
         loss = l1 + l2
         loss.backward()
@@ -88,10 +88,10 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, cri
             opt_disc.zero_grad()
 
             pred_upscaled = discriminator(upscaled)
-            l1 = crit_disc(pred_upscaled, torch.ones(batch_size//2, 1, device=pred_upscaled.device))
+            l1 = crit_disc(pred_upscaled, torch.zeros(batch_size//2, 1, device=pred_upscaled.device))
 
             pred_orig = discriminator(orig)
-            l2 = crit_disc(pred_orig, torch.zeros(batch_size//2, 1, device=pred_orig.device))
+            l2 = crit_disc(pred_orig, torch.ones(batch_size//2, 1, device=pred_orig.device))
 
             loss = l1 + l2
             loss.backward()

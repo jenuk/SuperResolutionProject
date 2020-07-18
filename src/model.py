@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 
+from layers import Residual
+
 class Model(nn.Module):
     def __init__(self, upscaling_factor):
         super().__init__()
