@@ -1,7 +1,7 @@
 import torch
 from tqdm.auto import tqdm
 
-def train_model(model, criterion, optimizer, loader, use_gpu=False):
+def train_model(model, criterion, optimizer, loader, crit_regularization = None, factor_regularization=1e-4, use_gpu=False):
     model.train()
 
     for k, (img, target) in tqdm(enumerate(loader), total=len(loader)):
@@ -10,12 +10,14 @@ def train_model(model, criterion, optimizer, loader, use_gpu=False):
             target = target.cuda()
 
         optimizer.zero_grad()
+
         out = model(img)
         loss = criterion(out, target)
+        if crit_regularization is not None:
+            loss = loss + factor_regularization * crit_regularization(out)
+
         loss.backward()
         optimizer.step()
-
-
 
 
 def train_discriminator(model, discriminator, optimizer, loader, use_gpu=False):
@@ -49,7 +51,8 @@ def train_discriminator(model, discriminator, optimizer, loader, use_gpu=False):
 
 
 
-def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, disc_freq = 1, use_gpu=False):
+def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, crit_regularization = None, factor_regularization=1e-4, disc_freq = 1, use_gpu=False):
+
     crit_disc = torch.nn.BCELoss()
     loop_len = disc_freq + 1
     batch_size = loader.batch_size
@@ -59,7 +62,7 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, dis
             img = img.cuda()
             target = target.cuda()
 
-        if k%loop_len != 0:
+        if k%loop_len == 0:
             # train model
             model.train()
             discriminator.eval()
@@ -67,6 +70,8 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, dis
             opt_model.zero_grad()
             out = model(img)
             loss = crit_model(out, target)
+            if crit_regularization is not None:
+                loss = loss + factor_regularization*crit_regularization(out)
             loss.backward()
 
             opt_model.step()

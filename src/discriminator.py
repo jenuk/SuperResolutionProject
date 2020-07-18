@@ -11,9 +11,18 @@ class Discriminator(nn.Module):
 
         self.input_size = input_size
 
+        self.from_rgb = nn.Sequential(
+            nn.Conv2d(3, 64, 1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, 1),
+            nn.ReLU(),
+            nn.Conv2d(64, 32, 1),
+            nn.ReLU(),
+        )
+
         self.convs = nn.ModuleList([
             nn.Sequential(                        # 0
-                nn.Conv2d(3, 16, 1, padding=1),
+                nn.Conv2d(32, 16, 1, padding=1),
                 nn.ReLU(),
             ),
             nn.Sequential(                        # 1
@@ -54,7 +63,7 @@ class Discriminator(nn.Module):
         # -> 1 for upscaled data
 
     def forward(self, x):
-        out = x
+        out = self.from_rgb(x)
         for k, layer in enumerate(self.convs):
             out = layer(out)
         out = out.reshape(-1, 16*(self.input_size//8)**2)
@@ -67,7 +76,7 @@ class Discriminator(nn.Module):
 
     def get_features(self, x, *ind_layers):
         res = []
-        out = x
+        out = self.from_rgb(x)
         for k, layer in enumerate(self.convs):
             out = layer(out)
             if k == ind_layers[0]:

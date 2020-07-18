@@ -6,31 +6,49 @@ class Model(nn.Module):
         super().__init__()
 
         self.upsample = nn.Upsample(scale_factor=upscaling_factor, mode="nearest")
-        self.convs = nn.Sequential(
-            nn.Conv2d(3, 16, 1),
+
+        self.from_rgb = nn.Sequential(
+            nn.Conv2d(3, 64, 1),
             nn.ReLU(),
-            nn.Conv2d(16, 64, 3, padding = 1),
+            nn.Conv2d(64, 64, 1),
             nn.ReLU(),
-            nn.Conv2d(64, 64, 3, padding = 1),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, 3, padding = 1),
-            nn.ReLU(),
-            nn.Conv2d(64, 16, 1),
-            nn.ReLU(),
-            nn.Sequential(
-                *(nn.Sequential(
-                    nn.Conv2d(16, 16, 3, padding=1),
-                    nn.ReLU(),
-                ) for _ in range(5))
-            ),
-            nn.ConvTranspose2d(16, 128, 3, 2, padding=1, output_padding=1),
+            nn.Conv2d(64, 32, 1),
             nn.ReLU(),
         )
-        self.to_rgb = nn.Conv2d(128+3, 3, 1)
+
+        self.features = nn.Sequential(
+            *(Residual(
+                nn.Conv2d(32, 32, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(32, 32, 3, padding=1),
+                nn.ReLU(),
+            ) for _ in range(4)),
+            nn.Conv2d(32, 128, 3, padding=1),
+            nn.ReLU(),
+        )
+
+        self.upscale = nn.Sequential(
+            *(nn.Sequential(
+                nn.ConvTranspose2d(128, 128, 3, 2, padding=1, output_padding=1),
+                nn.ReLU(),
+            ) for _ in range(upscaling_factor.bit_length()-1))
+        )
+
+        self.to_rgb = nn.Sequential(
+            nn.Conv2d(128+3, 64, 1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, 1),
+            nn.ReLU(),
+            nn.Conv2d(64, 3, 1),
+        )
 
     def forward(self, x):
         up = self.upsample(x)
-        out = self.convs(x)
+
+        out = self.from_rgb(x)
+        out = self.features(out)
+        out = self.upscale(out)
+
         out = torch.cat((out, up), axis=1)
         out = self.to_rgb(out)
 

@@ -56,17 +56,12 @@ class DiscriminatorLoss(nn.Module):
         self.criterion = nn.BCELoss()
 
     def forward(self, x):
-        return self.criterion(x, torch.zeros(batch_size, 1, device=x.device))
+        return self.criterion(self.disc(x), torch.zeros(x.shape[0], 1, device=x.device))
 
-class MixLoss(nn.Module):
-    def __init__(self, **losses):
-        super(MixLoss, self).__init__()
+class TotalVariationLoss(nn.Module):
+    def forward(self, x):
+        res = torch.sum((x[..., :, 1:] - x[..., :, :-1])**2, axis=(1,2,3))
+        res = res + torch.sum((x[..., 1:, :] - x[..., :-1, :])**2, axis=(1,2,3))
+        res = torch.mean(res)
 
-        self.losses = losses
-
-    def forward(self, **args):
-        loss = 0
-        for key in args:
-            loss = loss + self.losses[key][1] * self.losses[key][0](*args[key])
-
-        return loss
+        return res
