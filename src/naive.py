@@ -8,20 +8,20 @@ from tqdm.auto import trange
 from layers import GaussianBlur
 
 img_no = 29
-img_path = f"data/comp_test/{img_no}.png"
+img_path = f"data/comp_test/00000/{img_no:05}.png"
 
 img_pil = Image.open(img_path)
 img_pil = img_pil.resize((256, 256))
+img_pil.save("results/resize_process/hr.png")
 img = F_tr.to_tensor(img_pil)
-
 gb = GaussianBlur(9, 3.0)
 
 blurred = gb(img.unsqueeze(0))
+F_tr.to_pil_image(blurred.squeeze()).save("results/resize_process/blurred.png")
 target = blurred[..., ::2, ::2]
+F_tr.to_pil_image(target.squeeze()).save("results/resize_process/lr.png")
 
 target.detach()
-
-F_tr.to_pil_image(target.squeeze()).show()
 
 res = nn.Parameter(torch.normal(0.5, 0.1, (1, 3, 256, 256)))
 opt = torch.optim.Adam([res], lr=1e-3)
@@ -45,10 +45,4 @@ while flag:
     flag = max_diff > 1/(2*256)
 
 res_pil = F_tr.to_pil_image(res.squeeze())
-res_pil.save(f"results/naive_{img_no}.png")
-res_pil.show()
-
-test = F_tr.to_tensor(Image.open(f"results/naive_{img_no}.png"))
-test2 = gb(test.unsqueeze(0))[..., ::2, ::2]
-print(torch.max(torch.abs(test2 - target)))
-F_tr.to_pil_image(test2.squeeze()).show()
+res_pil.save(f"results/resize_process/backwards.png")

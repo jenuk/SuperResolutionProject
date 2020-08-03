@@ -32,11 +32,13 @@ print("Done.")
 print("Saving...", end=" ", flush=True)
 Path("comp_validation").mkdir(exist_ok = True)
 Path("comp_test").mkdir(exist_ok = True)
+Path("comp_validation/00000").mkdir(exist_ok = True)
+Path("comp_test/00000").mkdir(exist_ok = True)
 
 for k, i in enumerate(val_choice):
-    copyfile(f"images1024x1024/{(i//1000)*1000:05}/{i:05}.png", f"comp_validation/{k}.png")
+    copyfile(f"images1024x1024/{(i//1000)*1000:05}/{i:05}.png", f"comp_validation/00000/{k:05}.png")
 
 for k, i in enumerate(test_choice):
-    copyfile(f"images1024x1024/{(i//1000)*1000:05}/{i:05}.png", f"comp_test/{k}.png")
+    copyfile(f"images1024x1024/{(i//1000)*1000:05}/{i:05}.png", f"comp_test/00000/{k:05}.png")
 
 print("Done.")
