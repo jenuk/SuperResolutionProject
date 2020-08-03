@@ -1,0 +1,35 @@
+\documentclass[beamer]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing}
+
+\usepackage{graphicx}
+\graphicspath{{../src/results/}}
+
+\begin{document}
+\resizebox{0.75\textwidth}{!}{
+\begin{tikzpicture}
+	\node (hr) at (0, 0) {\includegraphics[width=5cm]{resize_process/hr}};
+	
+	\node (blurred) at (10, 0) {\includegraphics[width=5cm]{resize_process/blurred}};
+	
+	\node (lr) at (10, -7) {\includegraphics[width=5cm]{resize_process/lr}};
+	
+	\only<2>{
+		\node (backward) at (0, -7) {\includegraphics[width=5cm]{resize_process/backwards}};
+		\draw [->, thick] (backward) -- (lr) node [midway, above] {$(I * g)_{2\bullet,2\bullet}$};
+		\draw [double distance=0.3cm, ultra thick, shorten <=1.5cm, shorten >=1.5cm] (backward) -- (hr);
+		\draw (-.6, -3.3) -- (.6, -3.8);
+	}
+	
+	
+	\draw [->, thick] (hr) -- (blurred) node [midway, above] {Blurring: $I^{\mathrm{B}} := I^{\mathrm{HR}} * g$};
+	
+	\draw [->, thick] (blurred) -- (lr) node [midway, right, align=left] {Subsampling\\$I^{\mathrm{LR}}_{ij} := I^{\mathrm{B}}_{2i, 2j}$};
+\end{tikzpicture}
+}
+\end{document}

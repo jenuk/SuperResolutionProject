@@ -1,0 +1,751 @@
+% !TeX spellcheck = en_US
+\documentclass[xcolor={dvipsnames}]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+%\usepackage[backend=biber, style=alphabetic]{biblatex} 
+%\addbibresource{main.bib}
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts, amsopn}
+
+\usepackage[draft,nomargin,inline]{fixme}
+
+\usepackage{standalone}
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing}
+
+\usepackage{pgffor}
+
+\usepackage{booktabs}
+
+\usepackage[backend=biber]{biblatex} 
+\addbibresource{main.bib}
+
+\usepackage{graphicx}
+\graphicspath{{../src/results/}}
+
+\DeclareMathOperator{\LR}{LR}
+\DeclareMathOperator{\HR}{HR}
+\newcommand{\ILR}{I^{\LR}}
+\newcommand{\IHR}{I^{\HR}}
+
+\newcommand{\emptyframe}[1]{%
+	\bgroup
+	\setbeamercolor{background canvas}{bg=#1}
+	\begin{frame}[plain]{}
+	\end{frame}
+	\egroup
+}
+
+\definecolor{highlightred}{RGB}{179,18,23}
+\newcommand{\highlight}[1]{{\color{highlightred} #1}}
+\newcommand{\althighlight}[2]{\alt<#1>{\highlight{#2}}{#2}}
+\newcommand{\altunderbrace}[3]{\alt<#1>{\underbrace{#2}_{#3}}{#2}}
+
+\usetheme{Berlin}
+\usecolortheme[RGB={120,12,15}]{structure}
+\useinnertheme{rectangles}
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\useoutertheme{infolines}
+\beamertemplatenavigationsymbolsempty
+
+% Disable shading between block title and block content
+\makeatletter
+\pgfdeclareverticalshading[lower.bg,upper.bg]{bmb@transition}{200cm}{color(0pt)=(lower.bg); color(4pt)=(lower.bg); color(4pt)=(upper.bg)}
+\makeatother
+
+\makeatletter
+\setbeamertemplate{footline}{%
+	\leavevmode%
+	\hbox{%
+		\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{author in head/foot}%
+			\hspace*{-16em}\usebeamertemplate{page number in head/foot}
+			\insertframenumber/\inserttotalframenumber\hfill
+			\usebeamerfont{author in head/foot}\insertshortauthor\phantom{M}
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{title in head/foot}%
+			\usebeamerfont{title in head/foot}\phantom{M}\insertshorttitle
+		\end{beamercolorbox}%
+	}%
+}
+\makeatother
+
+%\setbeamertemplate{headline}{}
+%\setbeamercolor{block body}{bg=white}
+%\setbeamercolor{title}{bg=white,fg=black}
+%\setbeamercolor{frametitle}{bg=white,fg=black}
+%\setbeamercolor{block title}{bg=white,fg=black}
+
+\setlength{\parskip}{0.4\baselineskip}
+\newcommand{\disponslide}[2]{%
+	\alt<#1>{#2}{\phantom{#2}}}
+
+\newcommand{\backupbegin}{
+	\newcounter{finalframe}
+	\setcounter{finalframe}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+	\setcounter{framenumber}{\value{finalframe}}
+}
+\newcommand{\myfill}{\vskip0pt plus 1filll\hfill}
+\newcommand{\skipbutton}[2]{\hyperlink{#1}{\beamerbutton{#2}}}
+
+
+
+\title{Super Resolution using Adversarial Network}
+\subtitle{Deep Vision Project}
+\author{Jonas Müller}
+\date{30\textsuperscript{th} July, 2020}
+
+\begin{document}
+\begin{frame}[plain]
+	\maketitle
+\end{frame}
+
+
+\begin{frame}{Idea}\hypertarget<3>{frame:idea}{}
+	Transform low resolution image \(\ILR\) to a high resolution image \(\IHR\).
+	
+	\uncover<2->{
+		Use a convolutional network \(T\), to learn the mapping \(\ILR \mapsto \IHR\).
+	}
+	
+	\uncover<3>{
+		How to measure difference between \(T(\ILR)\) and \(\IHR\)?
+		\begin{itemize}
+			\item Pixelwise Mean Square Error,
+			\item Perception Loss.
+		\end{itemize}
+	}
+
+	\myfill
+	\skipbutton{frame:dataset}{Dataset}
+	\skipbutton{frame:ilr_ihr}{Low Resolution}
+\end{frame}
+
+\begin{frame}{Model}\label{frame:model}
+	\vskip0pt plus 1filll
+	\includestandalone{model}
+	
+	\myfill
+	\skipbutton{frame:disc}{Discriminator}
+\end{frame}
+
+\begin{frame}{\(2\times\) (Bicubic)}\label{frame:bicubic_2}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/2x/bicubic_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 26.68 \\
+			SSIM: 0.823
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{2x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/bicubic_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/bicubic1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/bicubic2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	\hfill
+	\skipbutton{frame:bicubic_int}{Bicubic}
+%	\skipbutton{frame:bicubic_2_0}{More}
+	\skipbutton{frame:psnr}{PSNR}
+	\skipbutton{frame:ssim}{SSIM}
+\end{frame}
+
+\begin{frame}{\(2\times\) (MSE Loss)}\label{frame:mse_2}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/2x/mse_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 31.49 \\
+			SSIM: 0.911
+		\end{column}
+	\end{columns}
+	\begin{columns}
+	\begin{column}{0.3\linewidth}
+		\includegraphics[width=\linewidth]{2x/low_29.png}
+		\begin{columns}
+		\begin{column}{0.5\linewidth}
+			\includegraphics[width=\linewidth]{2x/crops/low1_29.png}
+		\end{column}
+		\begin{column}{0.5\linewidth}
+			\includegraphics[width=\linewidth]{2x/crops/low2_29.png}
+		\end{column}
+		\end{columns}
+	\end{column}
+	\begin{column}{0.3\textwidth}
+		\includegraphics[width=\linewidth]{2x/mse_29.png}
+		\begin{columns}
+			\begin{column}{0.5\linewidth}
+				\includegraphics[width=\linewidth]{2x/crops/mse1_29.png}
+			\end{column}
+			\begin{column}{0.5\linewidth}
+				\includegraphics[width=\linewidth]{2x/crops/mse2_29.png}
+			\end{column}
+		\end{columns}
+	\end{column}
+	\begin{column}{0.3\textwidth}
+		\includegraphics[width=\linewidth]{2x/high_29.png}
+		\begin{columns}
+			\begin{column}{0.5\linewidth}
+				\includegraphics[width=\linewidth]{2x/crops/high1_29.png}
+			\end{column}
+			\begin{column}{0.5\linewidth}
+				\includegraphics[width=\linewidth]{2x/crops/high2_29.png}
+			\end{column}
+		\end{columns}
+	\end{column}
+	\end{columns}
+	
+	\hfill
+%	\skipbutton{frame:mse_2_0}{More \(2\times\)}
+	\skipbutton{frame:mse_chained_4}{\(4\times\)}
+	\skipbutton{frame:mse_chained_8}{\(8\times\)}
+	\skipbutton{frame:psnr}{PSNR}
+	\skipbutton{frame:ssim}{SSIM}
+\end{frame}
+
+\begin{frame}{\(2\times\) (VGG Perception Loss)}\label{frame:perception_2}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/2x/perception_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 23.22 \\
+			SSIM: 0.805
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{2x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/perception_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/perception1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/perception2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	
+	\hfill
+%	\skipbutton{frame:perception_2_0}{More}
+	\skipbutton{frame:psnr}{PSNR}
+	\skipbutton{frame:ssim}{SSIM}
+\end{frame}
+
+\begin{frame}{\(2\times\) (Discriminator Perception Loss)}\label{frame:disc_2}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/2x/disc_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 15.98 \\
+			SSIM: 0.458
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{2x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/disc_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/disc1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/disc2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{2x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{2x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	
+	\hfill
+%	\skipbutton{frame:disc_2_0}{More}
+	\skipbutton{frame:psnr}{PSNR}
+	\skipbutton{frame:ssim}{SSIM}
+	\skipbutton{frame:disc}{Discriminator}
+\end{frame}
+
+\begin{frame}[plain]
+	\centering\LARGE Thank you for your attention!
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliography}
+	\renewcommand*{\bibfont}{\scriptsize}
+	\nocite{*}
+	\tiny
+	\printbibliography
+\end{frame}
+
+\appendix
+\backupbegin
+\section{Additional Material}
+\begin{frame}{Overview}\label{frame:overview}
+	{\large Previous}\\
+	\skipbutton{frame:idea}{Idea}
+	\skipbutton{frame:model}{Model}
+	\skipbutton{frame:bicubic_2}{Bicubic}
+	\skipbutton{frame:mse_2}{MSE}
+	\skipbutton{frame:perception_2}{Perception (VGG)}
+	\skipbutton{frame:disc_2}{Perception (Discriminator)}
+	\\[1cm]
+	
+	{\large Information}\\
+	\skipbutton{frame:dataset}{Dataset}
+	\skipbutton{frame:ilr_ihr}{Low Resolution}
+	\skipbutton{frame:disc}{Discriminator}
+	\skipbutton{frame:bicubic_int}{Bicubic Interpolation}
+	\skipbutton{frame:psnr}{PSNR}
+	\skipbutton{frame:ssim}{SSIM}
+	\skipbutton{frame:other_img}{Set 5\&14}
+	\\[1cm]
+	
+	{\large Other Models}\\
+%	$\mathbf{2\times}$:
+%	\skipbutton{frame:bicubic_2_0}{Bicubic}
+%	\skipbutton{frame:mse_2_0}{MSE}
+%	\skipbutton{frame:perception_2_0}{Perception}
+%	\\
+	$\mathbf{4\times}$:
+	\skipbutton{frame:mse_chained_4}{MSE chained}
+	\\
+	$\mathbf{8\times}$:
+	\skipbutton{frame:mse_chained_8}{MSE chained}
+	
+\end{frame}
+
+\begin{frame}{Flickr-Faces-HQ Dataset}\label{frame:dataset}
+	\begin{center}
+		\includegraphics[width=0.6\linewidth]{ffhq-teaser}
+	\end{center}
+	
+	\begin{columns}
+	\begin{column}{0.5\textwidth}
+		\begin{itemize}
+			\item $70,000$ images
+			\item $1,024 \times 1,024$ resolution
+			\item Crawled from \nolinkurl{flickr.com}
+		\end{itemize}
+	\vfill\null
+	\end{column}
+	\begin{column}{0.5\textwidth}
+		\begin{itemize}
+			\item Split into train, validation and test set of $55,000$, $10,000$ and $5,000$ images
+			\item Used $256 \times 256$ as high resolution
+		\end{itemize}
+	\end{column}
+	\end{columns}
+
+	\myfill
+	\skipbutton{frame:idea}{Back}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{\(\ILR\) and \(\IHR\)}\label{frame:ilr_ihr}
+	\vskip0pt plus 1filll
+	\includestandalone{resize_process}
+	
+	\myfill
+	\hyperlink{frame:idea}{\beamerbutton{Back}}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{Discriminator}\label{frame:disc}
+	\vskip0pt plus 1filll
+	\includestandalone{disc}
+	
+	\myfill
+	\skipbutton{frame:model}{Back}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{Bicubic Interpolation}\label{frame:bicubic_int}
+\begin{center}
+\begin{tikzpicture}
+	\foreach \x in {-2,-1,...,4}{
+		\foreach \y in {-2,-1,...,4}{
+			\fill [fill=lightgray] (\x, \y) circle (0.05);
+		}
+	}
+	\foreach \x in {0,1,...,3}{
+		\foreach \y in {0,1,...,3}{
+			\draw [fill=black] (\x, \y) circle (0.05);
+		}
+	}
+	\fill [fill=blue] (1.3, 1.6) circle (0.05);
+\end{tikzpicture}
+\end{center}
+\myfill
+\skipbutton{frame:bicubic_2}{Back}
+\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{PSNR}\label{frame:psnr}
+	Peak-Signal-to-Noise-Ratio:
+	\[
+		\mathrm{PSNR}(I, J)
+		= 10\cdot \log_{10}\Big(\frac{L^2}{\mathrm{MSE}(I, J)}\Big)
+	\]
+	where
+	\[
+		L = \max I,
+		\qquad
+		\mathrm{MSE}(I, J)
+		= \frac{1}{3\cdot W \cdot H} \sum_{c=1}^3\sum_{n}^W\sum_m^H (I_{cnm} - J_{cnm})^2
+	\]
+	
+	\myfill
+	\skipbutton{frame:bicubic_2}{Bicubic}
+	\skipbutton{frame:mse_2}{MSE}
+	\skipbutton{frame:perception_2}{Perception}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{SSIM}\label{frame:ssim}
+	Structural Similarity Index Measure:
+	\[
+		\mathrm{SSIM}(I, J)
+		= \frac{2\mu_I\mu_J + k_1}{\mu_I^2+\mu_J^2+k_1} \cdot \frac{\sigma_{IJ} + k_2}{\sigma_I^2 + \sigma_J^2 + k_2}
+	\]
+	where
+	\begin{itemize}
+		\item $\mu_I$ mean of $I$,
+		\item $\sigma_I^2$ variance of $I$,
+		\item $\sigma_{IJ}$ covariance of $I$ and $J$,
+		\item $k_1$, $k_2$ constants.
+	\end{itemize}
+	
+	\myfill
+	\skipbutton{frame:bicubic_2}{Bicubic}
+	\skipbutton{frame:mse_2}{MSE}
+	\skipbutton{frame:perception_2}{Perception}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+%\foreach \n in {bicubic, perception, mse, disc}{
+%	\foreach \y in {0}{
+%%	\foreach \y in {0,1,...,10}{
+%	\begin{frame}{\(2\times\) (\n{} loss)}\label{frame:\n_2_\y}
+%		\input{../src/results/2x/\n_\y}
+%		\begin{columns}
+%			\begin{column}{0.3\linewidth}
+%				\includegraphics[width=\linewidth]{2x/low_\y.png}
+%			\end{column}
+%			\begin{column}{0.3\textwidth}
+%				\includegraphics[width=\linewidth]{2x/\n_\y.png}
+%			\end{column}
+%			\begin{column}{0.3\textwidth}
+%				\includegraphics[width=\linewidth]{2x/high_\y.png}
+%			\end{column}
+%		\end{columns}
+%		
+%		\hfill
+%		\skipbutton{frame:\n_2}{Back}
+%		\skipbutton{frame:overview}{Overview}
+%	\end{frame}
+%	}
+%}
+
+\begin{frame}{Set 5 \& Set 14 ($2\times$)}\label{frame:other_img}
+	\myfill
+	\begin{center}
+	\begin{tabular}{lrrrr}
+		\toprule
+		Model & Set 5 & & Set 14 & \\
+		\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+		& PSNR & SSIM & PSNR & SSIM \\
+		\midrule
+		Bicubic & 27.30 & 0.857 & 25.23 & 0.777 \\
+		MSE & 34.58 & 0.946 & 30.42 & 0.897 \\
+		Perception & 22.70 & 0.801 & 22.69 & 0.787 \\
+		\bottomrule
+	\end{tabular}
+	\end{center}
+	
+	\myfill
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+
+
+
+
+\begin{frame}{\(4\times\) (MSE Loss)}\label{frame:mse_4}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/4x/mse_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 27.91 \\
+			SSIM: 0.820
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{4x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{4x/mse_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/mse1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/mse2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{4x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	
+	\hfill
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+
+\begin{frame}{\(4\times\) (MSE Loss, Chained)}\label{frame:mse_chained_4}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/4x/mse_chained_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			PSNR: 26.03\\
+			SSIM: 0.788
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{4x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{4x/mse_chained_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/mse_chained1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/mse_chained2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{4x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{4x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	
+	\hfill
+	\skipbutton{frame:mse_chained_4_0}{More}
+	\skipbutton{frame:mse_2}{Back}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+\begin{frame}{\(8\times\) (MSE Loss, Chained)}\label{frame:mse_chained_8}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{../src/results/8x/mse_chained_29}
+		\end{column}
+		\begin{column}{0.1\textwidth}
+			Mean:\\\phantom{Hallo}
+		\end{column}
+		\begin{column}{0.8\textwidth}
+			PSNR: 21.71\\
+			SSIM: 0.623
+		\end{column}
+	\end{columns}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\includegraphics[width=\linewidth]{8x/low_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/low1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/low2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{8x/mse_chained_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/mse_chained1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/mse_chained2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\includegraphics[width=\linewidth]{8x/high_29.png}
+			\begin{columns}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/high1_29.png}
+				\end{column}
+				\begin{column}{0.5\linewidth}
+					\includegraphics[width=\linewidth]{8x/crops/high2_29.png}
+				\end{column}
+			\end{columns}
+		\end{column}
+	\end{columns}
+	
+	\hfill
+	\skipbutton{frame:mse_chained_8_0}{More}
+	\skipbutton{frame:mse_2}{Back}
+	\skipbutton{frame:overview}{Overview}
+\end{frame}
+
+%\foreach \x in {4, 8}{
+%	\foreach \y in {0}{
+%%	\foreach \y in {0,1,...,10}{
+%	\begin{frame}{\(\x\times\) (MSE Loss, Chained)}\label{frame:mse_chained_\x_\y}
+%		\input{../src/results/\x x/mse_chained_\y}
+%		\begin{columns}
+%			\begin{column}{0.3\linewidth}
+%				\includegraphics[width=\linewidth]{\x x/low_\y.png}
+%			\end{column}
+%			\begin{column}{0.3\textwidth}
+%				\includegraphics[width=\linewidth]{\x x/mse_chained_\y.png}
+%			\end{column}
+%			\begin{column}{0.3\textwidth}
+%				\includegraphics[width=\linewidth]{\x x/high_\y.png}
+%			\end{column}
+%		\end{columns}
+%	
+%		\hfill
+%		\skipbutton{frame:mse_chained_\x}{Back}
+%		\skipbutton{frame:overview}{Overview}
+%	\end{frame}
+%}
+%}
+\backupend
+\end{document}

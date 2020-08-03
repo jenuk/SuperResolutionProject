@@ -1,0 +1,91 @@
+\documentclass[beamer]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing}
+
+\begin{document}
+	
+\pgfdeclarelayer{bg}    % declare background layer
+\pgfdeclarelayer{box}    % declare background layer
+\pgfsetlayers{box,bg,main}  % set the order of the layers (main is the standard layer)
+	
+\resizebox{0.9\textwidth}{!}{
+\begin{tikzpicture}[node distance=0.6cm]
+	\tikzstyle{layer} = [draw, rectangle, minimum height=0.1cm, minimum width=4cm, rotate=90]
+	\tikzstyle{conv} = [layer, fill=blue!20]
+	\tikzstyle{transconv} = [layer, fill=green!20]
+	\tikzstyle{relu} = [layer, fill=red!20]
+	\tikzstyle{data} = [line width=1mm, ->, color=blue]
+	\tikzstyle{resdata} = [line width=0.5mm, ->, color=blue]
+	\tikzstyle{resBlock} = [layer, fill=cyan!30]
+	\tikzstyle{upBlock} = [layer, fill=lime!60]
+	
+	\node [layer] (input) {$I^{\mathrm{LR}}$};
+	
+	\node [conv, below of=input, node distance=1.8cm] (toRGB1) {Conv: $1, 64$};
+	\node [relu, below of=toRGB1, node distance=0.8cm] (toRGB1relu) {ReLU};
+	\node [conv, below of=toRGB1relu] (toRGB2) {};%{Conv: $1, 64$};
+	\node [relu, below of=toRGB2] (toRGB2relu) {};%{ReLU};
+	\node [conv, below of=toRGB2relu] (toRGB3) {Conv: $1, 32$};
+	\node [relu, below of=toRGB3] (toRGB3relu) {};%{ReLU};
+	\begin{pgfonlayer}{box}
+		\draw [fill=gray!10] ($(toRGB1) - (0.7, 2.5)$) -|  ($(toRGB3relu) + (0.7, 2.5)$) -| node [pos=0.3, above] {Color Space Mapping} cycle;
+	\end{pgfonlayer}
+	
+
+	\node [conv, below of=toRGB3relu, node distance=2cm] (res1) {Conv: $3, 32$};
+	\node [relu, below of=res1] (res1relu) {};%{ReLU};
+	\node [conv, below of=res1, node distance=1cm] (res2) {};%{Conv: $3, 32$};
+	\node [relu, below of=res2] (res2relu) {};%{ReLU};
+	\node [draw, circle, rotate=90, below of=res2relu, fill=white] (resAdd) {$+$};
+	\draw [resdata] ($(res1) + (-0.5, 0)$) -- ++(0, -2.2) -| (resAdd);
+	\begin{pgfonlayer}{box}
+		\draw [fill=cyan!30]
+			($(res1) - (0.8, 2.5)$) -| ($(resAdd) + (0.5, 2.5)$) -|
+			node [pos=0, above] {Non-Linear Feature Mapping} cycle;
+	\end{pgfonlayer}
+	
+	\node [resBlock, below of=resAdd, node distance=1cm] (resB2) {};
+	\node [resBlock, below of=resB2] (resB3) {};
+	\node [resBlock, below of=resB3] (resB4) {};
+	
+	\node [conv, below of=resB4, node distance=1cm] (ueberGang) {Conv: $3, 128$};
+	\node [relu, below of=ueberGang] (ueberGangrelu) {};%{ReLU};
+	
+	\node [transconv, below of=ueberGangrelu, node distance=1.5cm] (tr1) {Transposed Conv: $3, 128$};
+	\node [relu, below of=tr1] (tr1relu) {};%{ReLU};
+	\begin{pgfonlayer}{box}
+		\draw [fill=lime!60]
+		($(tr1) - (0.8, 2.5)$) -| ($(tr1relu) + (0.5, 2.5)$) -|
+		node [pos=0, above] {Upscaling} cycle;
+	\end{pgfonlayer}
+	\node [upBlock, below of=tr1relu, node distance=1cm] (tr2) {};
+	\node [upBlock, below of=tr2] (tr3) {};
+	\draw [decorate,decoration={brace,amplitude=10pt,mirror}, very thick]
+	($(tr1) + (-0.9, -2.5)$) -- ($(tr3) + (0.5, -2.5)$) node [black,midway,below=0.3cm] {$\log_2(\mathtt{upscaling\_factor})$};
+	
+	
+	\node [conv, below of=tr3, node distance=2cm] (fromRGB1) {Conv: $1, 64$};
+	\node [relu, below of=fromRGB1] (fromRGB1relu) {};%{ReLU};
+	\node [conv, below of=fromRGB1relu] (fromRGB2) {};%{Conv: $1, 64$};
+	\node [relu, below of=fromRGB2] (fromRGB2relu) {};%{ReLU};
+	\node [conv, below of=fromRGB2relu] (fromRGB3) {Conv: $1, 3$};
+	\begin{pgfonlayer}{box}
+		\draw [fill=gray!10] ($(fromRGB1) - (0.7, 2.5)$) -| ($(fromRGB3) + (0.7, 2.5)$) -| node [pos=0.3, above] {Color Reconstruction} cycle ;
+	\end{pgfonlayer}
+	
+	\node [layer, node distance=2cm, below of=fromRGB3] (output) {$I^*$};
+	
+	\draw [data] ($(input) + (.6, 0)$) -- ++(0, -4.5) -| ($(fromRGB1) + (-1, 0)$)
+	node [pos=0.3, fill=green!30!lime!50, rectangle, draw=black, thin, text=black, minimum height=1cm] {Nearest Neighbor Upsampling};
+	
+	\begin{pgfonlayer}{bg}    % select the background layer
+		\draw [data] (input) -- (output);
+	\end{pgfonlayer}
+\end{tikzpicture}
+}
+\end{document}
