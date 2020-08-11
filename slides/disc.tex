@@ -46,7 +46,7 @@
 	\node [convBlock, below of=b4] (b5) {};
 	\node [convBlock, below of=b5] (b6) {};
 	
-	\node [conv, below of=b6, node distance=1cm] (shrink) {Conv: $3, 16$};
+	\node [conv, below of=b6, node distance=1cm] (shrink) {Conv: $1, 16$};
 	
 	\node [fc, below of=shrink, node distance=1cm] (fc1) {FC: $100$};
 	\node [relu, below of=fc1, node distance=0.5cm] (fc1relu) {};

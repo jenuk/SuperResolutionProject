@@ -4,21 +4,25 @@ from torch.nn import functional as F
 from torchvision.transforms import functional as F_tr
 from PIL import Image, ImageFilter
 from tqdm.auto import trange
+from math import ceil
 
 from layers import GaussianBlur
 
 img_no = 29
 img_path = f"data/comp_test/00000/{img_no:05}.png"
 
+scale_factor = 4
+sigma = 1.0
+
 img_pil = Image.open(img_path)
 img_pil = img_pil.resize((256, 256))
 img_pil.save("results/resize_process/hr.png")
 img = F_tr.to_tensor(img_pil)
-gb = GaussianBlur(9, 3.0)
+gb = GaussianBlur(ceil(3*sigma), sigma)
 
 blurred = gb(img.unsqueeze(0))
 F_tr.to_pil_image(blurred.squeeze()).save("results/resize_process/blurred.png")
-target = blurred[..., ::2, ::2]
+target = blurred[..., ::scale_factor, ::scale_factor]
 F_tr.to_pil_image(target.squeeze()).save("results/resize_process/lr.png")
 
 target.detach()
@@ -30,13 +34,13 @@ flag = True
 while flag:
     for i in trange(1000):
         opt.zero_grad()
-        out = gb(res)[..., ::2, ::2]
+        out = gb(res)[..., ::scale_factor, ::scale_factor]
         loss = F.mse_loss(out, target)
         loss.backward()
         opt.step()
 
     res.data.copy_(torch.clamp(torch.round(res*255)/255, 0, 1))
-    out = gb(res)[..., ::2, ::2]
+    out = gb(res)[..., ::scale_factor, ::scale_factor]
     loss = F.mse_loss(out, target)
     print(loss)
     max_diff = torch.max(torch.abs(out - target))
