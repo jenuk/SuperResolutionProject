@@ -1,0 +1,60 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\frenchspacing
+
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage[group-four-digits]{siunitx}
+
+\usepackage{microtype}
+\usepackage{csquotes}
+
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing, positioning}
+
+\usepackage{pgffor}
+\usepackage{graphicx}
+\graphicspath{{./images/}{../src/results/}}
+\usepackage{standalone}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[draft]{fixme}
+
+\usepackage[backend=biber, style=authoryear, sorting=nyt, maxcitenames=2]{biblatex}
+\addbibresource{main.bib}
+\setlength{\bibitemsep}{0.3em}
+
+\usepackage[ocgcolorlinks=true, citecolor=Green]{hyperref}
+
+\usepackage[super]{nth}
+\newcommand{\MONTH}{%
+	\ifcase\the\month
+	\or January% 1
+	\or February% 2
+	\or March% 3
+	\or April% 4
+	\or May% 5
+	\or June% 6
+	\or July% 7
+	\or August% 8
+	\or September% 9
+	\or October% 10
+	\or November% 11
+	\or December% 12
+	\fi}
+
+\newcommand{\ILR}{I^{\mathrm{LR}}}
+\newcommand{\IHR}{I^{\mathrm{HR}}}
+\newcommand{\IOUT}{I^{\mathrm{out}}}
+
+\newcommand{\doubleplus}{+\mkern-8mu+}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}

@@ -1,0 +1,52 @@
+\documentclass[margin=10mm]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing, positioning}
+
+\usepackage{graphicx}
+\graphicspath{{../../src/results/}}
+
+\begin{document}
+\begin{tikzpicture}
+	\node (low) at (-2.5, 0) {\includegraphics[width=5cm]{2x/low_29}};
+	\node [below left=0cm and -2.6cm of low] {\includegraphics[width=2.3cm]{2x/crops/low1_29}};
+	\node [below right=0cm and -2.6cm of low] {\includegraphics[width=2.3cm]{2x/crops/low2_29}};
+	\node [above of=low, align=center, node distance=3.2cm] {Low Resolution\\\\};
+	
+	
+	\node [right of=low, node distance=5.1cm] (high) {\includegraphics[width=5cm]{2x/high_29}};
+	\node [below left=0cm and -2.6cm of high] {\includegraphics[width=2.3cm]{2x/crops/high1_29}};
+	\node [below right=0cm and -2.6cm of high] {\includegraphics[width=2.3cm]{2x/crops/high2_29}};
+	\node [above of=high, align=center, node distance=3.2cm] {High Resolution\\\\};
+	
+	\node [right of=high, node distance=5.1cm] (bicubic) {\includegraphics[width=5cm]{2x/bicubic_29}};
+	\node [below left=0cm and -2.6cm of bicubic] {\includegraphics[width=2.3cm]{2x/crops/bicubic1_29}};
+	\node [below right=0cm and -2.6cm of bicubic] {\includegraphics[width=2.3cm]{2x/crops/bicubic2_29}};
+	\node [above of=bicubic, align=center, node distance=3.2cm] {Bicubic\\\input{../../src/results/2x/bicubic_29}};
+	
+	
+	
+	
+	\node [right of=bicubic, node distance=5.1cm] (mse) {\includegraphics[width=5cm]{2x/mse_29}};
+%	\node [below of=low, node distance=10cm] (mse) {\includegraphics[width=5cm]{2x/mse_29}};
+	\node [below left=0cm and -2.6cm of mse] {\includegraphics[width=2.3cm]{2x/crops/mse1_29}};
+	\node [below right=0cm and -2.6cm of mse] {\includegraphics[width=2.3cm]{2x/crops/mse2_29}};
+	\node [above of=mse, align=center, node distance=3.2cm] {MSE\\\input{../../src/results/2x/mse_29}};
+	
+	\node [right of=mse, node distance=5.1cm] (perception) {\includegraphics[width=5cm]{2x/perception_29}};
+	\node [below left=0cm and -2.6cm of perception] {\includegraphics[width=2.3cm]{2x/crops/perception1_29}};
+	\node [below right=0cm and -2.6cm of perception] {\includegraphics[width=2.3cm]{2x/crops/perception2_29}};
+	\node [above of=perception, align=center, node distance=3.2cm] {Perceptual (VGG)\\\input{../../src/results/2x/perception_29}};
+	
+	\node [right of=perception, node distance=5.1cm] (disc) {\includegraphics[width=5cm]{2x/disc_29}};
+	\node [below left=0cm and -2.6cm of disc] {\includegraphics[width=2.3cm]{2x/crops/disc1_29}};
+	\node [below right=0cm and -2.6cm of disc] {\includegraphics[width=2.3cm]{2x/crops/disc2_29}};
+	\node [above of=disc, align=center, node distance=3.2cm] {Perceptual (Discriminator)\\\input{../../src/results/2x/disc_29}};
+	
+	
+\end{tikzpicture}
+\end{document}

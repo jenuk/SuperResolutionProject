@@ -1,0 +1,22 @@
+\documentclass[margin=10mm]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing}
+
+\usepackage{graphicx}
+\graphicspath{{../../src/results/}}
+
+\begin{document}
+\begin{tikzpicture}
+	\node (lr) at (-5.1, 0) {\includegraphics[width=5cm]{2x/low_29}};
+	\node [left of=lr, node distance=5.1cm] (hr) {\includegraphics[width=5cm]{2x/high_29}};
+	\node [left of=hr, node distance=5.1cm] (bicubic) at (5.1, 0) {\includegraphics[width=5cm]{2x/bicubic_29}};
+	\node [left of=bicubic, node distance=5.1cm] (mse) at (10.2, 0) {\includegraphics[width=5cm]{2x/mse_29}};
+	\node [left of=mse, node distance=5.1cm] (perception) at (15.3, 0) {\includegraphics[width=5cm]{2x/perception_29}};
+	\node [left of=perception, node distance=5.1cm] (disc) at (20.4, 0) {\includegraphics[width=5cm]{2x/disc_29}};
+\end{tikzpicture}
+\end{document}

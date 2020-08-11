@@ -1,0 +1,74 @@
+\documentclass[margin=10mm]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing}
+
+\begin{document}
+	
+\pgfdeclarelayer{bg}    % declare background layer
+\pgfdeclarelayer{box}    % declare background layer
+\pgfsetlayers{box,bg,main}  % set the order of the layers (main is the standard layer)
+	
+\resizebox{0.9\textwidth}{!}{
+\begin{tikzpicture}[node distance=0.4cm]
+	\tikzstyle{layer} = [draw, rectangle, minimum height=0.1cm, minimum width=3cm, rotate=90]
+	\tikzstyle{conv} = [layer, fill=blue!20]
+	\tikzstyle{transconv} = [layer, fill=green!20]
+	\tikzstyle{relu} = [layer, fill=red!20]
+	\tikzstyle{max} = [layer, fill=yellow!20]
+	\tikzstyle{fc} = [layer, fill=magenta!30]
+	\tikzstyle{data} = [line width=1mm, ->, color=blue]
+	\tikzstyle{dataout} = [line width=1mm, ->, color=red]
+	\tikzstyle{resdata} = [line width=0.5mm, ->, color=blue]
+	\tikzstyle{resBlock} = [layer, fill=cyan!30]
+	\tikzstyle{convBlock} = [layer, fill=teal!30]
+	
+	\node [layer] (input) {$I^{\mathrm{in}}$};
+	
+	\node [conv, below of=input, node distance=1cm] (conv1) {Conv: $3, 16$};
+	\node [relu, below of=conv1, node distance=0.7cm] (conv1relu) {ReLU};
+	
+	\node [conv, below of=conv1relu, node distance=1cm] (conv11) {Conv: $3, 16$};%{Conv: $1, 64$};
+	\node [relu, below of=conv11, node distance=0.5cm] (conv11relu) {};%{ReLU};
+	\node [conv, below of=conv11relu] (conv12) {};%{Conv: $1, 32$};
+	\node [relu, below of=conv12] (conv12relu) {};%{ReLU};
+	\node [max, below of=conv12relu, node distance=0.5cm] (max1) {MaxPool: $2, 2$};
+	\begin{pgfonlayer}{box}
+		\draw [fill=teal!30] ($(conv11) - (0.5, 2)$) -|  ($(max1) + (0.7, 2)$) -| node [pos=0.3, above] {Conv. Block: 16} cycle;
+	\end{pgfonlayer}
+	
+	\node [conv, below of=max1, node distance=1.5cm] (conv21) {Conv: $3, 32$};%{Conv: $1, 64$};
+	\node [relu, below of=conv21, node distance=0.5cm] (conv21relu) {};%{ReLU};
+	\node [conv, below of=conv21relu] (conv22) {};%{Conv: $1, 32$};
+	\node [relu, below of=conv22] (conv22relu) {};%{ReLU};
+	\node [max, below of=conv22relu, node distance=0.5cm] (max2) {MaxPool: $2, 2$};
+	\begin{pgfonlayer}{box}
+	\draw [fill=teal!30] ($(conv21) - (0.5, 2)$) -|  ($(max2) + (0.7, 2)$) -| node [pos=0.3, above] {Conv. Block: 32} cycle;
+	\end{pgfonlayer}
+	
+	\node [convBlock, below of=max2, node distance=1.4cm] (b3) {Conv. Block: $64$};
+	\node [convBlock, below of=b3, node distance=0.5cm] (b4) {};
+	\node [convBlock, below of=b4] (b5) {};
+	\node [convBlock, below of=b5] (b6) {};
+	
+	\node [conv, below of=b6, node distance=1cm] (shrink) {Conv: $1, 16$};
+	
+	\node [fc, below of=shrink, node distance=1cm] (fc1) {FC: $100$};
+	\node [relu, below of=fc1, node distance=0.5cm] (fc1relu) {};
+	\node [fc, below of=fc1relu, node distance=0.5cm] (fc2) {FC: $1$};
+	\node [relu, below of=fc2, node distance=0.7cm] (fc2sigmoid) {Sigmoid};
+	
+	\node [layer, below of=fc2sigmoid, node distance=1.5cm] (output) {$\mathbf{P}(\mathrm{real}\mid I^{\mathrm{in}})$};
+	
+	\begin{pgfonlayer}{bg}    % select the background layer
+		\draw [data] (input) -- (output);
+		\draw [dataout] (conv12relu) --++ (0, -3) node [below right, text=black] {$\phi_{\mathrm{disc}}^{1,2}$};
+		\draw [dataout] (conv22relu) --++ (0, -3) node [below right, text=black] {$\phi_{\mathrm{disc}}^{2,2}$};
+	\end{pgfonlayer}
+\end{tikzpicture}
+}
+\end{document}
