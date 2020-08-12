@@ -1,3 +1,11 @@
+"""
+samples 100 random images without copyright from validation and test set, to easily asses visual quality
+
+saves them in
+comp_validation/ (for validation images)
+comp_test/ (for test images)
+"""
+
 import random
 import json
 from pathlib import Path

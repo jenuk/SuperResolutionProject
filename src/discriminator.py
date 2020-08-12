@@ -3,7 +3,11 @@ from torch import nn
 
 class Discriminator(nn.Module):
     """
-    learns p(upscaled | img)
+    torch Module that earns p(upscaled | img)
+
+    Discriminator to distinguish upscaled from original high resolution images.
+    Offers `get_features` to access feautres after different layers.
+    See report for schematic.
     """
 
     def __init__(self, input_size):
@@ -51,7 +55,7 @@ class Discriminator(nn.Module):
                 nn.MaxPool2d(2, 2)
             ) for _ in range(3)),
             nn.Conv2d(64, 16, 1),
-        ])
+        ]) # -> (N, 16, input_size/2^6, input_size/2^6)
 
         self.fc1 = nn.Linear(16*(input_size//(2**6))**2, 100)
         self.fc2 = nn.Linear(100, 1)
@@ -73,8 +77,21 @@ class Discriminator(nn.Module):
         return out
 
     def get_features(self, x, *ind_layers):
+        """
+        Parameters
+        ----------
+        x : torch.tensor
+            input to network
+        ind_layers : sequence of ints
+            indices to layers from which results are to be returned
+
+        Returns
+        -------
+        list of torch.tensor
+            results from layers specified by ind_layers
+        """
+
         res = []
-        #out = self.from_rgb(x)
         out = x
         for k, layer in enumerate(self.convs):
             out = layer(out)

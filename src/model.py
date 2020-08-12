@@ -5,6 +5,13 @@ from layers import Residual
 
 class Model(nn.Module):
     def __init__(self, upscaling_factor):
+        """
+        Parameters
+        ----------
+        upscaling_factor:
+            factor by which to increase the input dimension, assumed to be
+            2^x.
+        """
         super().__init__()
 
         self.upsample = nn.Upsample(scale_factor=upscaling_factor, mode="nearest")
@@ -35,6 +42,8 @@ class Model(nn.Module):
                 nn.ReLU(),
             ) for _ in range(upscaling_factor.bit_length()-1))
         )
+        # if upscaling is a power of two, then:
+        # upscaling_factor.bit_length() -1 = log_2(upscaling_factor)
 
         self.to_rgb = nn.Sequential(
             nn.Conv2d(128+3, 64, 1),

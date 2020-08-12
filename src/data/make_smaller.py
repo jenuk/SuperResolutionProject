@@ -1,3 +1,5 @@
+"""downscales images for faster dataloading"""
+
 from PIL import Image
 from pathlib import Path
 from tqdm.auto import tqdm

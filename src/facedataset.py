@@ -12,7 +12,7 @@ class FaceDataset(torch.utils.data.Dataset):
         Parameters
         ----------
         path : str
-            path to the images, should not end with `/`
+            path to the image folders, should not end with `/`
         start : int
             first image to consider part of the dataset (should be in
             [0, 70'000))
@@ -21,10 +21,16 @@ class FaceDataset(torch.utils.data.Dataset):
             (start, 70'000])
         lower_res : int
             resolution of low resolution image returned by `__getitem__`
-        high_res : int
-            resolution of high resolution image returned by `__getitem__`
+        factor : int
+            scale factor by which the high res image is bigger than the low res
+            image returned by `__getitem__`
+        sigma : float, optional
+            sigma used in the gaussian blur (default `1.0`)
         p_flip : float, optional
-            probability of flipping an image horizontal (default 0.5)
+            probability of flipping an image horizontal (default `0.5`)
+        use_gpu : bool, optional
+            whether returned values should be written on the gpu, does not work
+            with multiple workers in dataloader (default `False`)
         """
 
         self.path = path
