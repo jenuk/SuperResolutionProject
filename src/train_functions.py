@@ -86,9 +86,7 @@ def train_discriminator(model, discriminator, optimizer, loader, use_gpu=False):
         optimizer.step()
 
 
-
-
-def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, crit_regularization = None, factor_regularization=1e-4, disc_freq = 1, use_gpu=False):
+def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, crit_regularization = None, factor_regularization=1e-4, disc_freq = 1, use_gpu=False, freq=100):
     """
     trains the model and discriminator alternatingly for one epoch.
 
@@ -112,9 +110,12 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, cri
         factor used to reduce the regularization, default `1e-4`
     disc_freq : int, optional
         how often to update the discriminator per model update, default `1`
-    use_gpu: bool
+    use_gpu : bool
         whether gpu is available.
+    freq : int, optional
+        how often to print current discriminator accuracy
     """
+
 
     crit_disc = torch.nn.BCELoss()
     loop_len = disc_freq + 1
@@ -147,6 +148,8 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, cri
             with torch.no_grad():
                 upscaled = model(img[:batch_size//2])
                 orig = target[batch_size//2:]
+                upscaled = upscaled + torch.normal(0, 0.03, (batch_size//2, 3, output_size, output_size), device=upscaled.device)
+                orig = orig + torch.normal(0, 0.03, (batch_size//2, 3, output_size, output_size), device=orig.device)
 
             opt_disc.zero_grad()
 
@@ -154,8 +157,14 @@ def train_mix(model, discriminator, crit_model, opt_model, opt_disc, loader, cri
             l1 = crit_disc(pred_upscaled, torch.zeros(batch_size//2, 1, device=pred_upscaled.device))
 
             pred_orig = discriminator(orig)
-            l2 = crit_disc(pred_orig, torch.ones(batch_size//2, 1, device=pred_orig.device))
+            l2 = crit_disc(pred_orig, 0.9*torch.ones(batch_size//2, 1, device=pred_orig.device))
 
             loss = l1 + l2
             loss.backward()
             opt_disc.step()
+
+        if k%freq == freq-1:
+            # show_results(model, val_loader, 5)
+            acc_o = 2*torch.sum(pred_orig >= 0.5).float()/batch_size
+            acc_u = 2*torch.sum(pred_upscaled < 0.5).float()/batch_size
+            print(f"{50*(acc_o+acc_u):.1f}%\t{100*acc_o:.1f}%\t{100*acc_u:.1f}%")
