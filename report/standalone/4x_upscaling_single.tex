@@ -1,0 +1,49 @@
+\documentclass[margin=10mm]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, decorations.pathreplacing, positioning}
+
+\usepackage{graphicx}
+\graphicspath{{../../src/results/}}
+
+\begin{document}
+\begin{tikzpicture}
+	\node (low) at (-2.5, 0) {\includegraphics[width=5cm]{4x/low_29}};
+	\node [below left=0cm and -2.6cm of low] {\includegraphics[width=2.3cm]{4x/crops/low1_29}};
+	\node [below right=0cm and -2.6cm of low] {\includegraphics[width=2.3cm]{4x/crops/low2_29}};
+	\node [above of=low, align=center, node distance=3.2cm] {Low Resolution\\\\};
+	
+	
+	\node [right of=low, node distance=5.1cm] (high) {\includegraphics[width=5cm]{4x/high_29}};
+	\node [below left=0cm and -2.6cm of high] {\includegraphics[width=2.3cm]{4x/crops/high1_29}};
+	\node [below right=0cm and -2.6cm of high] {\includegraphics[width=2.3cm]{4x/crops/high2_29}};
+	\node [above of=high, align=center, node distance=3.2cm] {High Resolution\\\\};
+	
+	\node [right of=high, node distance=5.1cm] (bicubic) {\includegraphics[width=5cm]{4x/bicubic_29}};
+	\node [below left=0cm and -2.6cm of bicubic] {\includegraphics[width=2.3cm]{4x/crops/bicubic1_29}};
+	\node [below right=0cm and -2.6cm of bicubic] {\includegraphics[width=2.3cm]{4x/crops/bicubic2_29}};
+	\node [above of=bicubic, align=center, node distance=3.2cm] {Bicubic\\\input{../../src/results/4x/bicubic_29}};
+	
+	
+	
+	
+	\node [right of=bicubic, node distance=5.1cm] (mse) {\includegraphics[width=5cm]{4x/mse_29}};
+	\node [below left=0cm and -2.6cm of mse] {\includegraphics[width=2.3cm]{4x/crops/mse1_29}};
+	\node [below right=0cm and -2.6cm of mse] {\includegraphics[width=2.3cm]{4x/crops/mse2_29}};
+	\node [above of=mse, align=center, node distance=3.2cm] {MSE\\\input{../../src/results/4x/mse_29}};
+	
+	\node [right of=mse, node distance=5.1cm] (mse_chained) {\includegraphics[width=5cm]{4x/mse_chained_29}};
+	\node [below left=0cm and -2.6cm of mse_chained] {\includegraphics[width=2.3cm]{4x/crops/mse_chained1_29}};
+	\node [below right=0cm and -2.6cm of mse_chained] {\includegraphics[width=2.3cm]{4x/crops/mse_chained2_29}};
+	\node [above of=mse_chained, align=center, node distance=3.2cm] {MSE Chained\\\input{../../src/results/4x/mse_chained_29}};
+	
+	\node [right of=mse_chained, node distance=5.1cm] (perception) {\includegraphics[width=5cm]{4x/perception_29}};
+	\node [below left=0cm and -2.6cm of perception] {\includegraphics[width=2.3cm]{4x/crops/perception1_29}};
+	\node [below right=0cm and -2.6cm of perception] {\includegraphics[width=2.3cm]{4x/crops/perception2_29}};
+	\node [above of=perception, align=center, node distance=3.2cm] {Perceptual (VGG)\\\input{../../src/results/4x/perception_29}};
+\end{tikzpicture}
+\end{document}
