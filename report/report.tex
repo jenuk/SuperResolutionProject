@@ -10,9 +10,6 @@
 
 \begin{document}
 \maketitle
-	\fxnote{remove draft from fixme}
-	\fxnote{add spaces between some par}
-
 \tableofcontents
 
 \section{Introduction}
@@ -20,14 +17,13 @@
 Single image super resolution is the task to create a \enquote{realistic} higher resolution image \( \IHR \) of a given image \( \ILR \).
 This task is not well defined, because if we only know \( \ILR \) then \( \IHR \) is not well defined, e.\,g. in \cref{fig:pulse_img} there are three high resolution images that scale down to the same low resolution image (also in \cref{fig:resize}).
 
-To overcome this problem in praxis and generate trainings data a function \( f\colon \IHR \mapsto \ILR \) is defined, and it is assumed that \( f(\IHR) \) is an image that would upscale to \( \IHR \).
+To overcome this problem in praxis and generate trainings data, a function \( f\colon \IHR \mapsto \ILR \) is defined, and it is assumed that \( f(\IHR) \) is an image that would upscale to \( \IHR \).
 Since the dimension of high resolution images is far greater than the dimension of low resolution images this function can not be injective.
 So this task is more complex than solving \( \argmin_{\hat I} \lVert f(\hat I) - \ILR \rVert_2 \) (\cref{fig:resize} shows the result of this optimization).
 
 The function \( f \) is usually defined as \( f(x) = (x * g) \downarrow_{s} \) where \( g \) is some blurring kernel, \( s \) is the scaling factor, and \( (x\downarrow_{s})_{i,j} := x_{si,sj} \) \parencite{survey_sr}.
 In this project the used kernel is a Gaussian kernel with standard deviation \(\sigma=1\).
 This process is visualized in \cref{fig:resize}.
-\fxnote{Use?}
 
 \begin{figure}
 \begin{center}
@@ -60,8 +56,6 @@ The high resolution images in this project are to \( \num{256} \times \num{256} 
 This dataset was then split into \num{55000} training, \num{10000} validation and \num{5000} test images.
 The validation data was used to monitor the progress during training and to adjust the hyperparameters.
 And the test set was first used when models were fully trained to compare the final performance of different approaches.
-\fxnote{Example Images}
-\fxnote{Small manifold}
 
 \begin{figure}
 	\centering
@@ -82,8 +76,8 @@ If the RGB color space is the most useful one for this problem, this block can e
 
 The second block is a standard convolutional network.
 It consists of four residual blocks each with two convolutional layers and an additional convolutional layer.
-This block learns a complex abstract representation of the image which will be used in the next block for upscaling.
-The residual blocks are sensible here for two reasons: in each residual block it learns the changes necessary to the input but does not have to retain the input itself; and the gradient can be carried backwards through many blocks with this approach because the gradients will not vanish.
+This block learns a abstract representation of the image which will then be used in the next block for upscaling.
+The residual blocks here are sensible for two reasons: each residual block only needs to learn the changes necessary to the input but does not have to retain the input itself; the other reason it that the gradient can be carried backwards through many blocks.
 The model could be improved by increasing the number of residual blocks.
 
 The next block upscales the current feature using transposed convolutional layers.
@@ -100,6 +94,7 @@ The last block enables the network to only learn the difference between \( \IHR 
 The basic idea here is to feed the input to the result so that the network can easily learn the identity function and then make small changes.
 This is done often, e.\,g. by \textcite{vdsr}, usually by element-wise addition, i.\,e. \( T(\ILR) \oplus \mathrm{Up}(\ILR) \).
 This block here concatenates the result of the upscaled version and the result of the network and again uses an pixel-wise fully connected network, to learn a more complex combination than addition.
+Adding this block significantly decreased the time the model needed for training.
 
 
 \begin{figure}
@@ -126,7 +121,7 @@ We can then define the perceptual loss by
 where \( N \) is the number of outputs neurons of \( \ell \).
 
 An idea that I wanted to try out was to use an discriminator network, that distinguishes upscaled from high resolution images, as the auxiliary network, a concept similar to a GAN \parencite{gan_goodfellow}.
-The plan was that the discriminator would detect features that the model does not synthesize well and the model could then improve specifically these problems.
+The plan was that the discriminator would detect features that the model does not synthesize well and the model could then improve specifically these features.
 
 
 \begin{figure}
@@ -140,7 +135,7 @@ The plan was that the discriminator would detect features that the model does no
 
 \subsection{Regularization}\label{sec:reg}
 
-When using perceptual loss it is necessary to use regularization \parencite{perceptual_loss}.
+When using a perceptual loss it is necessary to use regularization \parencite{perceptual_loss}.
 Because optimizing through a convolutional layer will result in noisy images and regularization smooths the result, as was discussed on exercise sheet 9.
 
 So by using regularization the result is pushed into the direction of the natural image manifold.
@@ -200,7 +195,7 @@ For both criteria a higher score is a better score.
 
 The overall test results for doubled resolution are in \cref{tab:results_2x}.
 But as mentioned before PSNR and SSIM alone are not sufficient to judge the visual quality.
-So in \cref{fig:2x_upscaling_single} there is an image from the test set upscaled by the different methods.
+So in \cref{fig:2x_upscaling_single}\footnote{Under \url{https://drive.google.com/drive/folders/1ZpuLoBAigyomHcMJQXsmpKrrJZJza-M3} 100 more upscaled images per model can be found, selected randomly from the test set.} there is an image from the test set upscaled by the different methods.
 All models used ADAM as optimizer.
 
 Bicubic interpolation is a static method that is included for reference.
@@ -222,7 +217,7 @@ This did not work out.
 The general setup was as in \textcite{gan_goodfellow} alternating updates of the super resolution model and the discriminator.
 The next problem was, that the model would adjust to quickly to the discriminator, causing the discriminator to be unable to learn the difference, even with really poor performance of the model.
 This could be solving by using a learning rate of \num{e-4} for the discriminator and \num{5e-6} for the model.
-With this setup the result stayed bad, but the discriminator was able to distinguish upscaled images.\fxnote{Image?}
+With this setup the result stayed bad, but the discriminator was able to distinguish upscaled images.
 The images were blurred and there was always a strong tint of different colors.
 My hypothesis was that the discriminator overfitted to a single feature.
 Next I added one-sided label smoothing \parencite{labelsmoothing}.
@@ -320,7 +315,7 @@ But maybe the problem here stems from to little training time as GAN networks ge
 In the paper by \cite{perceptual_loss} they mention a post processing step, which matches the color distribution of the upscaled image to the input image.
 I have not implemented this, which explains why my perceptual loss results are not as good as in the original paper.
 
-\fxnote{letzter Satz}
+All in all the once futuristic \enquote{Can you enhance this?} from crime shows is a lot more realistic today.
 
 
 \clearpage
